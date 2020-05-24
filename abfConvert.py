@@ -6,6 +6,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 from main_ui import Ui_MainWindow
 from abfconvertIO import Convert
+from about import  Ui_Dialog
 
 def error(func,**kwargs):
     def wrapper(self, *args, **kwargs):
@@ -23,7 +24,6 @@ class Worker(QtCore.QThread):
         self.tempfile=files
         self.suffix=suffix
         self.issplit=issplit
-        print(self.issplit)
         self.timesteps=timesteps
     
     def run(self):
@@ -32,8 +32,6 @@ class Worker(QtCore.QThread):
             temp.toCsvTxt(suffix=self.suffix,
             issplit=self.issplit,
             timesteps=self.timesteps)
-            print(index)
-            print(len(self.tempfile))
             self.progressBarValue.emit([(index+1)/len(self.tempfile)*100,0])
         self.progressBarValue.emit([(index+1)/len(self.tempfile)*100,1])
 
@@ -49,12 +47,12 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
         self.actionClearAllFiles.triggered.connect(self.clearlist)
         self.RunButton.clicked.connect(self.runconvert)
         self.actionExit.triggered.connect(self.closeEvent)
-        
+        aboutaction=self.menu.addAction('about')
+        aboutaction.triggered.connect(self.about)
     def openfile(self):
         self.statusBar().showMessage(self.tr("Open file"))
         fn = QFileDialog.getOpenFileNames(self, self.tr(
             "Open file"), filter='Abf Files (*.abf)')
-        print(fn)
         if len(fn[0]) == 0:
             self.statusBar().showMessage(self.tr("No file selected"))
         else:
@@ -62,22 +60,18 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
                 if i not in self.files:
                     self.files.append(i)
                     self.listWidget.addItem(os.path.basename(i))
-            print(self.files)
     
     def openfolder(self):
         self.statusBar().showMessage(self.tr("Open folder"))
         fn = QFileDialog.getExistingDirectory(self,
                   "选取文件夹",
                   "./")
-        print(fn)
         files=glob.glob(fn+'/*.abf')
-        print(files)
         for i in files:
             i=i.replace('\\','/')
             if i not in self.files:
                 self.files.append(i)
                 self.listWidget.addItem(os.path.basename(i))
-        print(self.files)
     
     def clearlist(self):
         self.files=[]
@@ -90,13 +84,11 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
             if s:
                 for i in s:
                     tempfile.append(self.files[i.row()])
-                print(tempfile)
             else:
                 tempfile=self.files
             if self.comboBox_aimfile.currentIndex() == 0:
                 # convert to matlab .mat file
                 for index,j in enumerate(tempfile):
-                    print(j)
                     temp=Convert(j)
                     temp.toMat()
                     self.progressBar.setValue((index+1)/len(tempfile)*100)
@@ -136,6 +128,16 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
 
     def closeEvent(self,event):
         sys.exit(app.exec_())
+        
+    def about(self):
+        self.about_dia=Ui_Dialog()
+        self.Dialog_d = QDialog(self)
+        self.about_dia.setupUi(self.Dialog_d)
+        self.about_dia.pushButton.clicked.connect(self.about_close)
+        self.Dialog_d.exec_()
+
+    def about_close(self):
+        self.Dialog_d.close()
         
 
 

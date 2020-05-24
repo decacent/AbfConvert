@@ -31,6 +31,10 @@
   <property name="windowTitle">
    <string>AbfConvert</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>abfConvert.png</normaloff>abfConvert.png</iconset>
+  </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
   </property>
@@ -297,13 +301,13 @@
     <addaction name="actionClearAllFiles"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="about">
     <property name="title">
      <string>关于</string>
     </property>
    </widget>
    <addaction name="FileMenu"/>
-   <addaction name="menu"/>
+   <addaction name="about"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
