@@ -1,1 +1,9 @@
 __pycache__/*
+build/*
+sub/__pycache__/abfconvertIO.cpython-38.pyc
+sub/__pycache__/axonio.cpython-38.pyc
+ui/__pycache__/about.cpython-38.pyc
+ui/__pycache__/main_ui.cpython-38.pyc
+ui/__pycache__/ui_rc.cpython-38.pyc
+ui/abfConvert.spec
+abfConvert.spec

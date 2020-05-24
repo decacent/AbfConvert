@@ -4,9 +4,9 @@ import os, sys, glob
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QSplashScreen, QDialog
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from main_ui import Ui_MainWindow
-from abfconvertIO import Convert
-from about import  Ui_Dialog
+from ui.main_ui import Ui_MainWindow
+from sub.abfconvertIO import Convert
+from ui.about import  Ui_Dialog
 
 def error(func,**kwargs):
     def wrapper(self, *args, **kwargs):
@@ -47,8 +47,7 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
         self.actionClearAllFiles.triggered.connect(self.clearlist)
         self.RunButton.clicked.connect(self.runconvert)
         self.actionExit.triggered.connect(self.closeEvent)
-        aboutaction=self.menu.addAction('about')
-        aboutaction.triggered.connect(self.about)
+        self.actionaboutmenu.triggered.connect(self.about)
     def openfile(self):
         self.statusBar().showMessage(self.tr("Open file"))
         fn = QFileDialog.getOpenFileNames(self, self.tr(
