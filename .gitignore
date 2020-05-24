@@ -7,3 +7,6 @@ ui/__pycache__/main_ui.cpython-38.pyc
 ui/__pycache__/ui_rc.cpython-38.pyc
 ui/abfConvert.spec
 abfConvert.spec
+sub/__pycache__/__init__.cpython-38.pyc
+sub/__pycache__/xdatio.cpython-38.pyc
+ui/__pycache__/__init__.cpython-38.pyc

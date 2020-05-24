@@ -48,6 +48,7 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
         self.RunButton.clicked.connect(self.runconvert)
         self.actionExit.triggered.connect(self.closeEvent)
         self.actionaboutmenu.triggered.connect(self.about)
+        
     def openfile(self):
         self.statusBar().showMessage(self.tr("Open file"))
         fn = QFileDialog.getOpenFileNames(self, self.tr(

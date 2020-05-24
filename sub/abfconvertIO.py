@@ -6,15 +6,17 @@ Created on Fri May 22 19:25:47 2020
 """
 
 import datetime
-from sub.axonio import Abf_io
 import numpy as np
 import scipy.io as sio
 from nptdms import TdmsWriter, RootObject, ChannelObject
 
+from sub.axonio import Abf_io
+from sub.xdatio import Xdat_io
+
 # read file name
 
 
-def form_time(date, microscend):
+def form_time(date:int, microscend:int):
     s, ms = divmod(microscend, 1000)
     s, ms = divmod(ms, 1000)
     m, s = divmod(s, 60)
@@ -25,16 +27,29 @@ def form_time(date, microscend):
 
 
 class Convert():
-    def __init__(self, filename):
-        self.fn = Abf_io(filename)
-        self.data, self.sam, self.sweeps = self.fn.read_abf()
-        if self.sweeps==0:
-            self.sweeps +=1
-        self.abf_info = self.fn.read_header()
-        self.filesignature = self.abf_info['fFileSignature'].decode()
-        self.fileVersion = self.abf_info['fFileVersionNumber']
-        self.chanles = len(self.abf_info['listADCInfo'])
-        self.groups = self.abf_info['lActualEpisodes']
+    def __init__(self, filename:str):
+        self.filetype= filename.rsplit('.',2)[-1]
+        if self.filetype == 'abf':
+            self.fn = Abf_io(filename)
+            self.data, self.sam, self.sweeps = self.fn.read_abf()
+            if self.sweeps==0:
+                self.sweeps +=1
+            self.abf_info = self.fn.read_header()
+            self.filesignature = self.abf_info['fFileSignature'].decode()
+            self.fileVersion = self.abf_info['fFileVersionNumber']
+            self.chanles = len(self.abf_info['listADCInfo'])
+            self.groups = self.abf_info['lActualEpisodes']
+        elif self.filetype=='xdat':
+            self.fn = Xdat_io(filename)
+            self.data, self.sam, self.sweeps = self.fn.read_abf()
+            if self.sweeps==0:
+                self.sweeps +=1
+            self.unit=['pA','mV']
+            self.channeename=['current','voltage']
+            self.filesignature = 'xdat'
+            self.fileVersion = 1.0
+            self.chanles = 2
+            self.groups = 1
         self.new_filebase = filename.rsplit('.', 1)[0]
 
     def gene_rootobj(self):
@@ -44,16 +59,26 @@ class Convert():
         return root_object
 
     def gene_channelobj(self, channelNum):
-
-        per = {'unit_string': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
-               'NI_ChannelName': self.abf_info['listADCInfo'][channelNum]['ADCChNames'].decode(),
-               'NI_UnitDescription': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
-               'wf_increment': float(1/self.sam),
-               'wf_samples': int(1),
-               'wf_start_offset': float(0),
-               'wf_start_time': form_time(self.abf_info['uFileStartDate'],
+        if self.filetype=='abf':
+            per = {'unit_string': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
+                'NI_ChannelName': self.abf_info['listADCInfo'][channelNum]['ADCChNames'].decode(),
+                'NI_UnitDescription': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
+                'wf_increment': float(1/self.sam),
+                'wf_samples': int(1),
+                'wf_start_offset': float(0),
+                'wf_start_time': form_time(self.abf_info['uFileStartDate'],
                                           self.abf_info['uFileStartTimeMS'])
-               }
+                }
+        else:
+            per = {'unit_string': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
+                'NI_ChannelName': self.abf_info['listADCInfo'][channelNum]['ADCChNames'].decode(),
+                'NI_UnitDescription': self.abf_info['listADCInfo'][channelNum]['ADCChUnits'].decode(),
+                'wf_increment': float(1/self.sam),
+                'wf_samples': int(1),
+                'wf_start_offset': float(0),
+                'wf_start_time': form_time(self.abf_info['uFileStartDate'],
+                                          self.abf_info['uFileStartTimeMS'])
+                }
         channel_name = per['NI_ChannelName']
         return channel_name, per
 
