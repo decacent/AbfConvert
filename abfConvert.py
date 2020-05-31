@@ -145,7 +145,7 @@ class AbfConvert(QMainWindow,Ui_MainWindow):
 
 
 if __name__ == '__main__':
-    QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
     mainWindow = AbfConvert()
     mainWindow.show()
